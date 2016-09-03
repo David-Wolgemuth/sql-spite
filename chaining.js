@@ -3,7 +3,7 @@ var spite = require("./sql-spite");
 
 
 spite.connect("database");
-spite.register("User", { firstName: "string", lastName: "string" });
+spite.register({ model: "User", table: "users" }, { firstName: "string", lastName: "string" });
 
 var User = spite.model("User");
 

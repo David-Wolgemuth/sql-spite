@@ -50,9 +50,12 @@ function makeModel (schema)
     if (typeof schema !== "object") {
         throw TypeError("Model Properties Must Be Defined");
     }
-    for (var key in schema) {
-        methods.push(key);
+    for (var i = 0; i < schema.columns.length; i++) {
+        methods.push(schema.columns[i].name);
     }
+
+    model.schema = schema;
+    model.tableName = schema.table;
     
     for (var i = 0; i < methods.length; i++) {
         var method = methods[i];

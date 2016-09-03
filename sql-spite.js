@@ -10,6 +10,7 @@ module.exports = spite;
 
 var makeModel = require("./model.js");
 var sqlite3 = require("sqlite3").verbose();
+var Schema = require("./schema");
 
 var registered = {};
 
@@ -26,28 +27,37 @@ function model (name)
     throw ReferenceError("Model \"" + name + "\" does not exist");
 }
 
-function register (name, schema)
+function register (options, schema)
 {
-    if (registered[name]) {
-        throw ReferenceError("Model \"" + name + "\" already exists");
+    if (!options || ! schema) {
+        throw Error("Schema Required to Register Model");
     }
-    var model = makeModel(schema);
-    model.tableName = name.toLowerCase() + "s";
-    var str = "CREATE TABLE IF NOT EXISTS " + model.tableName + " (id INTEGER PRIMARY KEY, ";
+    if (typeof options.model !== "string" || typeof options.table !== "string") {
+        throw Error("model and table name are required to register model");
+    }
+    if (registered[options.model]) {
+        throw ReferenceError("Model \"" + options + "\" already exists");
+    }
+    schema = new Schema(options, schema);
+    var str = "CREATE TABLE IF NOT EXISTS " + schema.table + " ( ";
     var first = true;
-    for (var column in schema) {
+    for (var i = 0; i < schema.columns.length; i++) {
+        var col = schema.columns[i];
         if (!first) {
             str += ", ";
         }
         first = false;
-        var type = schema[column];
-        str += column + " " + type;
+        str += col.name + " " + col.type;
     }
     str += ")";
+
+    console.log(" >>>\n", str, "\n <<<");
+
+    var model = makeModel(schema);
     spite.db.run(str, function (err) {
         if (err) {
             console.log("ERROR", err);
         }
     });
-    registered[name] = model;
+    registered[options.model] = model;
 }
