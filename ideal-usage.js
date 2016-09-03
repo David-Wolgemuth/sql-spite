@@ -4,7 +4,7 @@
 
 // ------ RETRIEVE ------ //
 
-User.all();
+User.find();
 
 User.find(id);
 
@@ -12,7 +12,7 @@ User.find.by.id(id);
 
 User.find({ id: id });
 
-User.first(); 
+User.first();
 
 User.find.where({ name: name });
 

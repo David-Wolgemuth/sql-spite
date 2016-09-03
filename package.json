@@ -7,5 +7,8 @@
     "test": "echo Hi"
   },
   "author": "David Wolgemuth <davidjwolgemuth@wgmail.com> (https://david-wolgemuth.github.io)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "sqlite3": "^3.1.4"
+  }
 }
