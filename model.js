@@ -1,21 +1,20 @@
 module.exports = makeModel;
 
-var Query = require("./query");
+var Query = require("./query/query");
 
 function makeModel (schema)
 {
-    var query = [];
     function model (callback) 
     {
         var returnSelf;
-        var li = query.length - 1;
-        var last = query[li];
+        var li = this.chain.length - 1;
+        var last = this.chain[li];
 
         for (var key in schema) {
             if (last === key) {
-                query[li] = {};
-                query[li][key] = arguments[0];
-                return new Query(query, this);
+                this.chain[li] = {};
+                this.chain[li][key] = arguments[0];
+                return new Query(this.chain, this);
             }
         }
 
@@ -25,20 +24,26 @@ function makeModel (schema)
         }
 
         if (last === "select" || last === "limit") {
-            query.push(args);
+            this.chain.push(args);
             return this;
         }
 
-        query.push(args);
-        return new Query(query, this);
+        this.chain.push(args);
+        console.log("BEFORE CLEARED:", this.chain);
+        var q = new Query(this.chain, this);
+        this.chain = [];
+        console.log("CLEARED", this.chain);
+        return q;
     }
 
-
+    model.chain = [];
+    
     var methods = [
         "find", "create", "update", "delete",
         "by", "where", "all", "not", "desc",
         "select", "limit", "order",
-        "first", "last"
+        "first", "last",
+        "sql"
     ];
 
     // find.by.email("cool@aid.com")
@@ -53,18 +58,19 @@ function makeModel (schema)
         var method = methods[i];
         Object.defineProperty(model, method, {
             set: function () {},
-            get: new ModelGetter(method, model, query)
+            get: new ModelGetter(method, model)
         });
     }
 
     return model;
 }
 
-function ModelGetter (method, model, query)
+function ModelGetter (method, model)
 {
     return function ()
     {
-        query.push(method);
+        console.log("CHAIN", method, model.chain);
+        model.chain.push(method);
         return model;
     };
 }
