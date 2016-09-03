@@ -4,16 +4,24 @@ var filter = require("../util/filter");
 var spite = require("../sql-spite");
 
 
-function Query (query, model)
+function Query (model)
 {
-    this.raw = query;
+    this.raw = [];
     this.model = model;
     this.query = null;
-    this.init();
+    // this.init();
 }
 
-Query.prototype.init = function()
+Query.prototype.add = function (args)
 {
+    this.raw.push(args);
+};
+
+Query.prototype._exec = function()
+{
+    this.raw.forEach(function (piece) {
+        console.log(">>", piece);
+    });
     var verb = filter.one(this.raw, ["find", "create", "new", "update", "upsert", "delete", "destroy", "sql"]);
     switch (verb) {
         case "find":

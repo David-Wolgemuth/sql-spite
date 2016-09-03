@@ -6,10 +6,20 @@ module.exports = function (Query)
 
 function CREATE ()
 {
-    var obj = this.raw[1][0];
+    var obj = this.raw[1];
     if (typeof obj !== "object") {
         throw Error("Not Object?");
     }
+
+    console.log('\n\n\n', this.model.schema, '\n\n\n');
+    var schema = this.model.schema;
+
+    if (schema.timestamps) {
+        var t = new Date().getTime();
+        obj.createdAt = t;
+        obj.updatedAt = t;
+    }
+
     var  keys = "";
     var values = "";
     var inputs = [];
@@ -25,6 +35,10 @@ function CREATE ()
         values += "?";
         inputs.push(value);
     }
-    var str = "INSERT INTO " + this.model.tableName + " ( " +  keys + " ) VALUES ( " + values + " );";
+    // if (schema.timestamps) {
+    //     keys += " createdAt, updatedAt ";
+    //     values += "NOW(), NOW()";
+    // }
+    var str = "INSERT INTO " + this.model.schema.table + " ( " +  keys + " ) VALUES ( " + values + " );";
     this.query = { string: str, inputs: inputs };
 }

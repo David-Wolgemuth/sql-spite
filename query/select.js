@@ -14,11 +14,17 @@ function SELECT ()
     for (var i = 0; i < this.raw.length; i++) {
         switch (this.raw[i]) {
             case "by":
-                query.where = this.raw[i+1];
+                var obj = {};
+                console.log("RAW:", this.raw, "(", this.raw[i+1], ")");
+                obj[this.raw[i+1]] = this.raw[i+2];
+                query.where = obj;
                 query.limit = 1;
                 break;
             case "where":
-                query.where = this.raw[i+1];
+                var obj = {};
+                console.log("RAW:", this.raw, "(", this.raw[i+1], ")");
+                obj[this.raw[i+1]] = this.raw[i+2];
+                query.where = obj;
                 break;
             case "limit":
                 query.limit = this.raw[i+1];
@@ -37,12 +43,15 @@ function SELECT ()
                 break;
         }
     }
-    var str = "SELECT " + query.select + " FROM " + this.model.tableName;
+    var str = "SELECT " + query.select + " FROM " + this.model.schema.table ;
     var inputs = [];
     if (query.where) {
-        str += " WHERE ";
-        if (typeof query === "object") {
+        // { where: { firstName: "David" } }
+        if (typeof query.where === "object") {
+            
+            str += " WHERE ";
             var first = true;
+            console.log("QUERY", query);
             for (var key in query.where) {
                 var val = query.where[key];
                 if (!first) {
@@ -52,6 +61,7 @@ function SELECT ()
                 str += key + "=?";
                 inputs.push(val);
             }
+
         }
     }
     if (query.order) {

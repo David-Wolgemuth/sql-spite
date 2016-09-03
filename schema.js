@@ -5,7 +5,7 @@ function Schema (options, columns)
     this.columns = [];
     this.methods = [];
     this.table = options.table;
-    
+
     var column;
     if (options.pk !== false) {
         column = new Column("id", "INTEGER PRIMARY KEY");
@@ -48,6 +48,7 @@ function Schema (options, columns)
         throw Error("Error creating Schema");
     }
     if (options.timestamps !== false) {
+        this.timestamps = true;
         column = new Column("createdAt", "INTEGER");
         this.columns.push(column);
         column = new Column("updatedAt", "INTEGER");

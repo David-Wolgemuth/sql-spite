@@ -1,11 +1,12 @@
-module.exports = function (Query)
+var Query = require("./query"); 
+module.exports = execProto;
+function execProto (Query)
 {
     for (var key in proto) {
         var method = proto[key];
         Query.prototype[key] = method;    
     }
-};
-
+}
 var spite = require("../sql-spite");
 
 var proto = {
@@ -15,31 +16,37 @@ var proto = {
     },
     row: function (cb)
     {
-        run.call(this, cb, "all", true);
-        return this;
+        return run.call(this, cb, "all", true);
     },
     rows: function (cb)
     {
-        run.call(this, cb, "all");
-        return this;
+        return run.call(this, cb, "all");
     },
     each: function (cb)
     {
-        run.call(this, cb, "each");
-        return this;
+        return run.call(this, cb, "each");
     },
     run: function (cb)
     {
-        run.call(this, cb, "run");
-        return this;
+        return run.call(this, cb, "run");
     },
+};
+execProto.methods = function ()
+{
+    var methods = [];
+    for (var key in proto) {
+        methods.push(key);
+    }
+    return methods;
 };
 
 function run (cb, verb, single)
 {
     var self = this;
+    self._exec();
+    self.model.query = new Query(self.model);
+    console.log("EXECUTING:", self.query);
     spite.db[verb](self.query.string, self.query.inputs, function (err, data) {
-        // console.log("RAN?", err, data);
         if (err) {
             if (typeof self._catch === "function") {
                 self._catch(err);
@@ -53,4 +60,5 @@ function run (cb, verb, single)
             }
         }
     });
+    return self;
 }

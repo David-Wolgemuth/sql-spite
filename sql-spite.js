@@ -8,7 +8,7 @@ var spite = {
 
 module.exports = spite;
 
-var makeModel = require("./model.js");
+var ClassModelGenerator = require("./class-model-generator.js");
 var sqlite3 = require("sqlite3").verbose();
 var Schema = require("./schema");
 
@@ -51,9 +51,9 @@ function register (options, schema)
     }
     str += ")";
 
-    console.log(" >>>\n", str, "\n <<<");
+    // console.log(" >>>\n", str, "\n <<<");
 
-    var model = makeModel(schema);
+    var model = new ClassModelGenerator(schema).model;
     spite.db.run(str, function (err) {
         if (err) {
             console.log("ERROR", err);
