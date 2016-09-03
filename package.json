@@ -1,0 +1,11 @@
+{
+  "name": "sql-spite",
+  "version": "1.0.0",
+  "description": "SQLite ORM, Influenced by Chai",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo Hi"
+  },
+  "author": "David Wolgemuth <davidjwolgemuth@wgmail.com> (https://david-wolgemuth.github.io)",
+  "license": "ISC"
+}
