@@ -10,25 +10,31 @@ function execProto (Query)
 var spite = require("../sql-spite");
 
 var proto = {
-    catch: function (cb)
-    {
-        this._catch = cb;
-    },
+    // then: function (cb)
+    // {
+    //     return run.call(this, cb);
+    // }
+    // catch: function (cb)
+    // {
+    //     this._catch = cb;
+    // },
     row: function (cb)
     {
-        return run.call(this, cb, "all", true);
+        console.log("Hit");
+        return run.call(this, "get");
     },
     rows: function (cb)
     {
-        return run.call(this, cb, "all");
+        return run.call(this, "all");
     },
-    each: function (cb)
-    {
-        return run.call(this, cb, "each");
-    },
+    // each: function (cb)
+    // {
+    //     return run.call(this, cb, "each");
+    // },
     run: function (cb)
     {
-        return run.call(this, cb, "run");
+        console.log("Hit");
+        return run.call(this, "run");
     },
 };
 execProto.methods = function ()
@@ -40,25 +46,27 @@ execProto.methods = function ()
     return methods;
 };
 
-function run (cb, verb, single)
+function run (verb)
 {
     var self = this;
     self._exec();
+
+    // Reset
     self.model.query = new Query(self.model);
-    console.log("EXECUTING:", self.query);
-    spite.db[verb](self.query.string, self.query.inputs, function (err, data) {
-        if (err) {
-            if (typeof self._catch === "function") {
-                self._catch(err);
+
+    return new Promise(function (resolve, reject) {
+
+        spite.db[verb](self.query.string, self.query.inputs, function (err, data) {
+            if (err) {
+                reject(err);
             }
-        }
-        if (typeof cb === "function") {
-            if (single) {
-                cb((data[0]) ? data[0] : null);
+            if (verb === "run") {
+                // These values are hidden in the `this` context, I don't like that, I might want to try to get the actual object?
+                resolve(this.lastID, this.changes);
             } else {
-                cb(data);
+                resolve(data);
             }
-        }
+        });
+
     });
-    return self;
 }

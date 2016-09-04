@@ -19,6 +19,7 @@ Query.prototype.add = function (args)
 
 Query.prototype._exec = function()
 {
+    console.log("EXEC");
     this.raw.forEach(function (piece) {
         console.log(">>", piece);
     });

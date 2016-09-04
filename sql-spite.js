@@ -16,7 +16,17 @@ var registered = {};
 
 function connect (name)
 {
-    spite.db = new sqlite3.Database(name + ".db");
+    return new Promise(function (resolve, reject) {
+        spite.db = new sqlite3.Database(name + ".db", function (err) {
+            if (err) {
+                console.log("rejecting", err);
+                reject(err);
+            } else {
+                console.log("resolving");
+                resolve();
+            }
+        });
+    });
 }
 
 function model (name)
@@ -38,6 +48,7 @@ function register (options, schema)
     if (registered[options.model]) {
         throw ReferenceError("Model \"" + options + "\" already exists");
     }
+
     schema = new Schema(options, schema);
     var str = "CREATE TABLE IF NOT EXISTS " + schema.table + " ( ";
     var first = true;
@@ -50,14 +61,17 @@ function register (options, schema)
         str += col.name + " " + col.type;
     }
     str += ")";
-
-    // console.log(" >>>\n", str, "\n <<<");
-
+    console.log("Registering:", str);
     var model = new ClassModelGenerator(schema).model;
-    spite.db.run(str, function (err) {
-        if (err) {
-            console.log("ERROR", err);
-        }
+
+    return new Promise(function (resolve, reject) {
+        spite.db.run(str, function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                registered[options.model] = model;
+                resolve();
+            }
+        });
     });
-    registered[options.model] = model;
 }

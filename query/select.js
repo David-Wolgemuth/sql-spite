@@ -12,16 +12,17 @@ function SELECT ()
         order: null
     };
     for (var i = 0; i < this.raw.length; i++) {
+        var obj;
         switch (this.raw[i]) {
             case "by":
-                var obj = {};
+                obj = {};
                 console.log("RAW:", this.raw, "(", this.raw[i+1], ")");
                 obj[this.raw[i+1]] = this.raw[i+2];
                 query.where = obj;
                 query.limit = 1;
                 break;
             case "where":
-                var obj = {};
+                obj = {};
                 console.log("RAW:", this.raw, "(", this.raw[i+1], ")");
                 obj[this.raw[i+1]] = this.raw[i+2];
                 query.where = obj;

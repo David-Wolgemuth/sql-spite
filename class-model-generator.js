@@ -63,7 +63,7 @@ function addGettersToModel (model)
             return model;
         };
     }
-    // User.find.where.name("Joe").desc.`rows()`
+    // User.find.where.name("Joe").desc.`rows(function (){})`
     for (i = 0; i < executables.length; i++) {
         var exec = executables[i];
         model[exec] = executable(exec);
