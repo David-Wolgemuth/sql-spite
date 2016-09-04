@@ -10,31 +10,21 @@ function execProto (Query)
 var spite = require("../sql-spite");
 
 var proto = {
-    // then: function (cb)
-    // {
-    //     return run.call(this, cb);
-    // }
-    // catch: function (cb)
-    // {
-    //     this._catch = cb;
-    // },
     row: function (cb)
     {
-        console.log("Hit");
-        return run.call(this, "get");
+        return run.call(this, "get", cb);
     },
     rows: function (cb)
     {
-        return run.call(this, "all");
+        return run.call(this, "all", cb);
     },
-    // each: function (cb)
-    // {
-    //     return run.call(this, cb, "each");
-    // },
+    each: function (cb)
+    {
+        return run.call(this, cb, "each", cb);
+    },
     run: function (cb)
     {
-        console.log("Hit");
-        return run.call(this, "run");
+        return run.call(this, "run", cb);
     },
 };
 execProto.methods = function ()
@@ -46,7 +36,7 @@ execProto.methods = function ()
     return methods;
 };
 
-function run (verb)
+function run (verb, cb)
 {
     var self = this;
     self._exec();
@@ -54,19 +44,12 @@ function run (verb)
     // Reset
     self.model.query = new Query(self.model);
 
-    return new Promise(function (resolve, reject) {
-
-        spite.db[verb](self.query.string, self.query.inputs, function (err, data) {
-            if (err) {
-                reject(err);
-            }
-            if (verb === "run") {
-                // These values are hidden in the `this` context, I don't like that, I might want to try to get the actual object?
-                resolve(this.lastID, this.changes);
-            } else {
-                resolve(data);
-            }
-        });
-
+    spite.db[verb](self.query.string, self.query.inputs, function (err, data) {
+        if (verb === "run") {
+            // These values are hidden in the `this` context, I don't like that, I might want to try to get the actual object?
+            cb(err, this.lastID, this.changes);
+        } else {
+            cb(err, data);
+        }
     });
 }

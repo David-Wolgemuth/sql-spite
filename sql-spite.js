@@ -14,18 +14,10 @@ var Schema = require("./schema");
 
 var registered = {};
 
-function connect (name)
+function connect (name, cb)
 {
-    return new Promise(function (resolve, reject) {
-        spite.db = new sqlite3.Database(name + ".db", function (err) {
-            if (err) {
-                console.log("rejecting", err);
-                reject(err);
-            } else {
-                console.log("resolving");
-                resolve();
-            }
-        });
+    spite.db = new sqlite3.Database(name + ".db", function (err) {
+        cb(err);
     });
 }
 
@@ -37,7 +29,7 @@ function model (name)
     throw ReferenceError("Model \"" + name + "\" does not exist");
 }
 
-function register (options, schema)
+function register (options, schema, cb)
 {
     if (!options || ! schema) {
         throw Error("Schema Required to Register Model");
@@ -64,14 +56,10 @@ function register (options, schema)
     console.log("Registering:", str);
     var model = new ClassModelGenerator(schema).model;
 
-    return new Promise(function (resolve, reject) {
-        spite.db.run(str, function (err) {
-            if (err) {
-                reject(err);
-            } else {
-                registered[options.model] = model;
-                resolve();
-            }
-        });
+    spite.db.run(str, function (err) {
+        if (!err) {
+            registered[options.model] = model;
+        }
+        cb(err);
     });
 }

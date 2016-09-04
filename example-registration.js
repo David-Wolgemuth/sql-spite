@@ -1,9 +1,18 @@
+
 var spite = require("./sql-spite");
 
-module.exports = Promise.all([
+module.exports = function (done) {
+    spite.connect("database", function (err) {
+        if (err) {
+            done(err);
+        } else {
+            registerUser(done);
+        }
+    });
+};
 
-    spite.connect("database"),
-
+function registerUser (done)
+{ 
     spite.register({ model: "User", table: "users" }, { 
         firstName: "string",
         lastName: "string",
@@ -21,8 +30,17 @@ module.exports = Promise.all([
                 toOne: "group",
             }
         }
-    }),
+    }, function (err) {
+        if (err) {
+            done(err);
+        } else {
+            registerMembership(done);
+        }
+    });
+}
 
+function registerMembership (done)
+{
     spite.register({ model: "Membership", table: "memberships" }, { 
         user: {
             type: "relationship",
@@ -38,8 +56,17 @@ module.exports = Promise.all([
                 foreignKey: "groupId"
             }
         }
-    }),
+    }, function (err) {
+        if (err) {
+            done(err);
+        } else {
+            registerGroup(done);
+        }
+    });
+}
 
+function registerGroup (done)
+{
     spite.register({ model: "Group", table: "groups" }, {
         name:  "string",
         memberships: {
@@ -49,6 +76,7 @@ module.exports = Promise.all([
                 foreignKey: "groupId"
             }
         },
-    })
-
-]);
+    }, function (err) {
+        done(err);
+    });
+}

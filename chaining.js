@@ -1,38 +1,50 @@
 
 var spite = require("./sql-spite");
+var register = require("./example-registration");
 
-require("./example-registration")
-.then(function () {
-    var User = spite.model("User");
-    var Group = spite.model("Group");
-    var Membership = spite.model("Membership");
+var User, Group, Membership;
 
-    Promise.all([
-        User.create({ firstName: "Joe", lastName: "Pesci" }).run(),
-        Group.create({ name: "The Peeps" }).run()
-    ]).then(function (ids) {
-        Membership.create({ userId: ids[0], groupId: ids[1] }).run()
-        .then(function (mId) {
-            console.log("Created", mId);
-            printMembership(mId);
+register(function (err) {
+    if (err) {
+        return console.log("Error:", err);
+    }
+    User = spite.model("User");
+    Group = spite.model("Group");
+    Membership = spite.model("Membership");
+    createMembership(printMembership);
+});
+
+function createUser (done)
+{
+    User.create({ firstName: "Joe", lastName: "Pesci" }).run(done);
+}
+function createGroupAndUser (done)
+{
+    createUser(function (err, userId) {
+        if (err) {
+            return done(err);
+        }
+        Group.create({ name: "The Peeps" }).run(function (err, groupId) {
+            done(err, groupId, userId);
         });
     });
-})
-.catch(function () {
-    console.log(arguments);
-});
-function printMembership(mId)
+}
+function createMembership (done)
 {
-    var User = spite.model("User");
-    var Group = spite.model("Group");
-    var Membership = spite.model("Membership");
+    createGroupAndUser(function (err, groupId, userId) {
+        if (err) {
+            return done(err);
+        }
+        Membership.create({ userId: userId, groupId: groupId }).run(done);
+    });
+}
+
+function printMembership(err, mId)
+{
     console.log("ID:", mId);
-    Membership.find.by.id(mId).row()
-    .then(function (membership) {
+    Membership.find.by.id(mId).row(function (err, membership) {
+        console.log("Error:", err);
         console.log("Membership:", membership);
-    })
-    .catch(function (err) {
-        console.log(err);
     });
 }
 // .then(function () {
