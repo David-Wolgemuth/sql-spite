@@ -27,7 +27,7 @@ function registerUser (done)
             type: "relationship",
             manyToMany: {
                 through: "memberships",
-                toOne: "group",
+                onOne: "group",
             }
         }
     }, function (err) {
@@ -76,6 +76,13 @@ function registerGroup (done)
                 foreignKey: "groupId"
             }
         },
+        users: {
+            type: "relationship",
+            manyToMany: {
+                through: "memberships",
+                onOne: "user"
+            }
+        }
     }, function (err) {
         done(err);
     });

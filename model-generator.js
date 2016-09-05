@@ -23,8 +23,10 @@ Model.prototype.init = function()
                 self[m.method] = manyToOne(self, m);
                 break;
             case "oneToMany":
-                console.log("oneToMany", m);
                 self[m.method] = oneToMany(self, m);
+                break;
+            case "manyToMany":
+                self[m.method] = manyToMany(self, m);
                 break;
         }
     }
@@ -78,21 +80,65 @@ function getterSetter (model, key)
     };
 }
 
-function manyToOne (model, one)
+function manyToOne (model, other)
 {
     return function (cb)
     {
-        var str = "SELECT * FROM " + one.table + " WHERE id=?";
-        var values = [model[one.foreignKey]()];  // Retreive id from obj
+        var str = "SELECT * FROM " + other.table + " WHERE id=?";
+        var values = [model[other.foreignKey]()];  // Retreive id from obj
         spite.db.get(str, values, cb);
     };
 }
 
-function oneToMany (model, many)
+function oneToMany (model, other)
 {
     return function (cb)
     {
-        var str = "SELECT * FROM " + many.table + " WHERE " + many.foreignKey + "=?";
+        var str = "SELECT * FROM " + other.table + " WHERE " + other.foreignKey + "=?";
+        var values = [model.id()];
+        spite.db.all(str, values, cb);
+    };
+}
+
+function manyToMany (model, many)
+{
+    var through;
+    for (var i = 0; i < model._schema.methods.length; i++) {
+        if (model._schema.methods[i].method === many.through) {
+            through = model._schema.methods[i];
+        }
+    }
+    if (!through) {
+        throw "Through Table Not Found";
+    }
+    var throughSchema;
+    var schemas = spite.schemas();
+    for (i = 0; i < schemas.length; i++) {
+        if (schemas[i].table === through.table) {
+            throughSchema = schemas[i];
+        }
+    }
+    if (!throughSchema) {
+        throw "Schema For Through Table Not Found";
+    }
+    var onOne;
+    for (i = 0; i < throughSchema.methods.length; i++) {
+        if (throughSchema.methods[i].method === many.onOne) {
+            onOne = throughSchema.methods[i];
+        }
+    }
+    if (!onOne) {
+        throw "Join Not Found For Through Table";
+    }
+    return function (cb)
+    {
+        var onFk = onOne.foreignKey;
+        var onT = onOne.table;
+        var tt = through.table;
+        var str =   "SELECT " + onOne.table + ".* " + 
+                    "FROM " + onOne.table + " " +
+                    "JOIN " + tt + " ON " + tt + "." + onFk + "=" + onT + ".id " +
+                    "WHERE " + tt + "." + through.foreignKey + "=?";
         var values = [model.id()];
         spite.db.all(str, values, cb);
     };

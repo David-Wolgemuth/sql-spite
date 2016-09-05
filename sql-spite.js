@@ -3,6 +3,7 @@ var spite = {
     model: model,
     register: register,
     connect: connect,
+    schemas: schemas,
     db: null
 };
 
@@ -19,6 +20,15 @@ function connect (name, cb)
     spite.db = new sqlite3.Database(name + ".db", function (err) {
         cb(err);
     });
+}
+
+function schemas ()
+{
+    var schemas_ = [];
+    for (var key in registered) {
+        schemas_.push(registered[key].schema);
+    }
+    return schemas_;
 }
 
 function model (name)
