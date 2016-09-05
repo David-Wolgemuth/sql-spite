@@ -45,6 +45,12 @@ function printMembership(err, mId)
     Membership.find.by.id(mId).row(function (err, membership) {
         console.log("Error:", err);
         console.log("Membership:", membership);
+        var Model = require("./model-generator");
+        membership = new Model(Membership.schema, membership);
+        console.log("Id:", membership.id());
+        membership.userId(16).groupId(16).save(function (err, changes) {
+            console.log("Passed:", err, changes);
+        });
     });
 }
 // .then(function () {
