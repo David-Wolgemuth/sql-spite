@@ -16,14 +16,12 @@ function SELECT ()
         switch (this.raw[i]) {
             case "by":
                 obj = {};
-                console.log("RAW:", this.raw, "(", this.raw[i+1], ")");
                 obj[this.raw[i+1]] = this.raw[i+2];
                 query.where = obj;
                 query.limit = 1;
                 break;
             case "where":
                 obj = {};
-                console.log("RAW:", this.raw, "(", this.raw[i+1], ")");
                 obj[this.raw[i+1]] = this.raw[i+2];
                 query.where = obj;
                 break;
@@ -52,7 +50,6 @@ function SELECT ()
             
             str += " WHERE ";
             var first = true;
-            console.log("QUERY", query);
             for (var key in query.where) {
                 var val = query.where[key];
                 if (!first) {

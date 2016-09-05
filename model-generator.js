@@ -14,20 +14,19 @@ Model.prototype.init = function()
 {
     var self = this;
     for (var key in self._data) {
-        self[key] = getterSetter(key);
+        self[key] = getterSetter(self, key);
     }
-    function getterSetter (key)
-    {
-        return function (set)
-        {
-            if (set !== undefined) {
-                self._stage = self._stage || {};
-                self._stage[key] = set;
-                return self;
-            } else {
-                return self._data[key];
-            }
-        };
+    for (var i = 0; i < self._schema.methods.length; i++) {
+        var m = self._schema.methods[i];
+        switch (m.type) {
+            case "manyToOne":
+                self[m.method] = manyToOne(self, m);
+                break;
+            case "oneToMany":
+                console.log("oneToMany", m);
+                self[m.method] = oneToMany(self, m);
+                break;
+        }
     }
 };
 
@@ -64,3 +63,37 @@ Model.prototype.save = function(cb)
         cb(err, this.changes);
     });
 };
+
+function getterSetter (model, key)
+{
+    return function (set)
+    {
+        if (set !== undefined) {
+            model._stage = model._stage || {};
+            model._stage[key] = set;
+            return model;
+        } else {
+            return model._data[key];
+        }
+    };
+}
+
+function manyToOne (model, one)
+{
+    return function (cb)
+    {
+        var str = "SELECT * FROM " + one.table + " WHERE id=?";
+        var values = [model[one.foreignKey]()];  // Retreive id from obj
+        spite.db.get(str, values, cb);
+    };
+}
+
+function oneToMany (model, many)
+{
+    return function (cb)
+    {
+        var str = "SELECT * FROM " + many.table + " WHERE " + many.foreignKey + "=?";
+        var values = [model.id()];
+        spite.db.all(str, values, cb);
+    };
+}

@@ -56,7 +56,6 @@ function addGettersToModel (model)
     {
         return function (args)
         {
-            console.log("Hi David", method, args);
             model(method);
             if (args) {
                 model(args);

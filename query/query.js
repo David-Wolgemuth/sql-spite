@@ -19,10 +19,10 @@ Query.prototype.add = function (args)
 
 Query.prototype._exec = function()
 {
-    console.log("EXEC");
-    this.raw.forEach(function (piece) {
-        console.log(">>", piece);
-    });
+    // console.log("EXEC");
+    // this.raw.forEach(function (piece) {
+    //     console.log(">>", piece);
+    // });
     var verb = filter.one(this.raw, ["find", "create", "new", "update", "upsert", "delete", "destroy", "sql"]);
     switch (verb) {
         case "find":

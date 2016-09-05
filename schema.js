@@ -5,13 +5,13 @@ function Schema (options, columns)
     this.columns = [];
     this.methods = [];
     this.table = options.table;
-    
+
     var column;
     if (options.pk !== false) {
         column = new Column("id", "INTEGER PRIMARY KEY");
         this.columns.push(column);
     }
-    
+
     for (var key in columns) {
         var type = columns[key];
         if (typeof type === "string") {
@@ -30,6 +30,7 @@ function Schema (options, columns)
             column = new Column(type.manyToOne.foreignKey, "INTEGER");
             this.columns.push(column);
             type.manyToOne.type = "manyToOne";
+            type.manyToOne.method = key;
             this.methods.push(type.manyToOne);
             continue;
         }
@@ -37,9 +38,11 @@ function Schema (options, columns)
             var m; 
             if (type.oneToMany) {
                 m = type.oneToMany;
+                m.method = key;
                 m.type = "oneToMany";
             } else {
                 m = type.manyToMany;
+                m.method = key;
                 m.type = "manyToMany";
             }
             this.methods.push(m);

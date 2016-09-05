@@ -48,8 +48,21 @@ function printMembership(err, mId)
         var Model = require("./model-generator");
         membership = new Model(Membership.schema, membership);
         console.log("Id:", membership.id());
+        console.log("Old User:", membership.userId());
+        console.log("Old Group:", membership.groupId());
         membership.userId(16).groupId(16).save(function (err, changes) {
-            console.log("Passed:", err, changes);
+            console.log("New User:", membership.userId());
+            console.log("New Group:", membership.groupId());
+            membership.group(function (err, group) {
+                console.log("I'll be so happy", err, group);
+            });
+            membership.user(function (err, user) {
+                console.log("Who will win?", err, user);
+                user = new Model(User.schema, user);
+                user.memberships(function (err, memberships) {
+                    console.log("Many?", err, memberships);
+                });
+            });
         });
     });
 }

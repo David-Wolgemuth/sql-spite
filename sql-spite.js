@@ -53,7 +53,6 @@ function register (options, schema, cb)
         str += col.name + " " + col.type;
     }
     str += ")";
-    console.log("Registering:", str);
     var model = new ClassModelGenerator(schema).model;
 
     spite.db.run(str, function (err) {

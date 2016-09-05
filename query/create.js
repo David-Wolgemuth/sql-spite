@@ -11,7 +11,6 @@ function CREATE ()
         throw Error("Not Object?");
     }
 
-    console.log('\n\n\n', this.model.schema, '\n\n\n');
     var schema = this.model.schema;
 
     if (schema.timestamps) {
