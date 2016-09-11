@@ -4,6 +4,7 @@ var spite = {
     register: register,
     connect: connect,
     schemas: schemas,
+    disconnect: disconnect,
     db: null
 };
 
@@ -12,14 +13,25 @@ module.exports = spite;
 var ClassModelGenerator = require("./class-model-generator.js");
 var sqlite3 = require("sqlite3").verbose();
 var Schema = require("./schema");
+var makePromiseOrCall = require("./util/make-promise-or-call");
 
 var registered = {};
 
 function connect (name, cb)
 {
-    spite.db = new sqlite3.Database(name + ".db", function (err) {
+    return makePromiseOrCall(_connect, { name: name }, cb);
+}
+function _connect (args, cb)
+{
+    spite.db = new sqlite3.Database(args.name + ".sqlite3", function (err) {
         cb(err);
     });
+}
+
+function disconnect ()
+{
+    registered = {};
+    spite.db = null;
 }
 
 function schemas ()
@@ -41,6 +53,13 @@ function model (name)
 
 function register (options, schema, cb)
 {
+    return makePromiseOrCall(_register, { options: options, schema: schema }, cb);
+}
+
+function _register (args, cb)
+{
+    var options = args.options;
+    var schema = args.schema;
     if (!options || ! schema) {
         throw Error("Schema Required to Register Model");
     }

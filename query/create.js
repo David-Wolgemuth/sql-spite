@@ -34,10 +34,6 @@ function CREATE ()
         values += "?";
         inputs.push(value);
     }
-    // if (schema.timestamps) {
-    //     keys += " createdAt, updatedAt ";
-    //     values += "NOW(), NOW()";
-    // }
     var str = "INSERT INTO " + this.model.schema.table + " ( " +  keys + " ) VALUES ( " + values + " );";
     this.query = { string: str, inputs: inputs };
 }

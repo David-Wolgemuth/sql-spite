@@ -9,6 +9,8 @@
   "author": "David Wolgemuth <davidjwolgemuth@wgmail.com> (https://david-wolgemuth.github.io)",
   "license": "ISC",
   "dependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2",
     "sqlite3": "^3.1.4"
   }
 }

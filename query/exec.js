@@ -44,12 +44,28 @@ function run (verb, cb)
     // Reset
     self.model.query = new Query(self.model);
 
-    spite.db[verb](self.query.string, self.query.inputs, function (err, data) {
-        if (verb === "run") {
-            // These values are hidden in the `this` context, I don't like that, I might want to try to get the actual object?
-            cb(err, this.lastID, this.changes);
-        } else {
-            cb(err, data);
-        }
-    });
+    if (typeof cb === "function") {
+        spite.db[verb](self.query.string, self.query.inputs, function (err, data) {
+            if (verb === "run") {
+                // These values are hidden in the `this` context, I don't like that, I might want to try to get the actual object?
+                cb(err, this.lastID, this.changes);
+            } else {
+                cb(err, data);
+            }
+        });
+    } else {
+        return new Promise(function (resolve, reject) {
+            spite.db[verb](self.query.string, self.query.inputs, function (err, data) {
+                if (err) {
+                    return reject(err);
+                }
+                if (verb === "run") {
+                    // These values are hidden in the `this` context, I don't like that, I might want to try to get the actual object?
+                    resolve(this.lastID, this.changes);
+                } else {
+                    resolve(data);
+                }
+            });
+        });
+    }
 }
