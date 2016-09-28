@@ -1,5 +1,5 @@
 
-module.exports = makePromiseOrCall;
+export { makePromiseOrCall };
 
 function makePromiseOrCall (func, args, cb)
 {

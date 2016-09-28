@@ -1,17 +1,13 @@
-module.exports = Schema;
-
-function Schema (options, columns)
-{
+"use strict";
+function Schema(options, columns) {
     this.columns = [];
     this.methods = [];
     this.table = options.table;
-
     var column;
     if (options.pk !== false) {
         column = new Column("id", "INTEGER PRIMARY KEY");
         this.columns.push(column);
     }
-
     for (var key in columns) {
         var type = columns[key];
         if (typeof type === "string") {
@@ -35,12 +31,13 @@ function Schema (options, columns)
             continue;
         }
         if (type.oneToMany || type.manyToMany) {
-            var m; 
+            var m;
             if (type.oneToMany) {
                 m = type.oneToMany;
                 m.method = key;
                 m.type = "oneToMany";
-            } else {
+            }
+            else {
                 m = type.manyToMany;
                 m.method = key;
                 m.type = "manyToMany";
@@ -58,9 +55,8 @@ function Schema (options, columns)
         this.columns.push(column);
     }
 }
-
-function Column (name, type)
-{
+exports.Schema = Schema;
+function Column(name, type) {
     this.name = name;
     this.type = type;
 }

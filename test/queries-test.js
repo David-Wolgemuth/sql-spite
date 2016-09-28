@@ -3,8 +3,8 @@ var expect = require("chai").expect;
 var connect = require("./helpers/connect");
 var register = require("./helpers/register");
 var populate = require("./helpers/populate");
-var spite = require("../sql-spite");
-var syncPromises = require("../util/sync-promises");
+var spite = require("./sql-spite");
+var syncPromises = require("../dist/util/sync-promises");
 var User, Group, Membership;
 
 describe("model queries", function () {

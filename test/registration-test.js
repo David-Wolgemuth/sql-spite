@@ -3,7 +3,7 @@ var expect = require("chai").expect;
 var connect = require("./helpers/connect");
 var register = require("./helpers/register");
 var fs = require("fs");
-var spite = require("../sql-spite");
+var spite = require("./sql-spite");
 
 describe("spite#connect(dbName, cb)", function () {
     it("creates / connects to a database", function (done) {

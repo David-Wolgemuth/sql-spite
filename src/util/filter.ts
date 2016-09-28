@@ -1,5 +1,7 @@
 
-module.exports = {
+export { filter };
+
+var filter = {
     one: function (arr, permitted)
     {
         var val;

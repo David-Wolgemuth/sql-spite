@@ -1,5 +1,5 @@
 
-module.exports = syncPromises;
+export { syncPromises };
 
 function syncPromises (promises)
 {

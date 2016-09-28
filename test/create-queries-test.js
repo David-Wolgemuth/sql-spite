@@ -3,7 +3,7 @@ require("./registration-test");  // Ensure this test runs first
 var expect = require("chai").expect;
 var connect = require("./helpers/connect");
 var register = require("./helpers/register");
-var spite = require("../sql-spite");
+var spite = require("./sql-spite");
 var populate = require("./helpers/populate");
 
 describe("model#create", function () {

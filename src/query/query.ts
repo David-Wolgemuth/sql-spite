@@ -1,7 +1,13 @@
-module.exports = Query;
 
-var filter = require("../util/filter");
-var spite = require("../sql-spite");
+export { Query };
+
+import { filter } from "../util/filter";
+import { spite } from "../sql-spite";
+
+import { addExecProtos } from "./exec";
+import { create } from "./create";
+import { select } from "./select";
+import { sql } from "./sql";
 
 
 function Query (model)
@@ -9,8 +15,12 @@ function Query (model)
     this.raw = [];
     this.model = model;
     this.query = null;
-    // this.init();
 }
+
+addExecProtos(Query);
+Query.prototype.create = create;
+Query.prototype.select = select;
+Query.prototype.sql = sql;
 
 Query.prototype.add = function (args)
 {
@@ -19,10 +29,6 @@ Query.prototype.add = function (args)
 
 Query.prototype._exec = function()
 {
-    // console.log("EXEC");
-    // this.raw.forEach(function (piece) {
-    //     console.log(">>", piece);
-    // });
     var verb = filter.one(this.raw, ["find", "create", "new", "update", "upsert", "delete", "destroy", "sql"]);
     switch (verb) {
         case "find":
@@ -39,7 +45,3 @@ Query.prototype._exec = function()
     }
 };
 
-require("./exec")(Query);
-require("./create")(Query);
-require("./select")(Query);
-require("./sql")(Query);

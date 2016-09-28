@@ -1,13 +1,9 @@
-var Query = require("./query"); 
-module.exports = execProto;
-function execProto (Query)
-{
-    for (var key in proto) {
-        var method = proto[key];
-        Query.prototype[key] = method;    
-    }
-}
-var spite = require("../sql-spite");
+
+import { Query } from "./query";
+import { spite } from "../sql-spite";
+// import {Promise} from 'es6-promise';
+
+export { addExecProtos, methods };
 
 var proto = {
     row: function (cb)
@@ -27,7 +23,8 @@ var proto = {
         return run.call(this, "run", cb);
     },
 };
-execProto.methods = function ()
+
+var methods = function ()
 {
     var methods = [];
     for (var key in proto) {
@@ -35,6 +32,15 @@ execProto.methods = function ()
     }
     return methods;
 };
+
+function addExecProtos (Query)
+{
+    for (var key in proto) {
+        var method = proto[key];
+        console.log("The Query?", Query.prototype);
+        Query.prototype[key] = method;    
+    }
+}
 
 function run (verb, cb)
 {
@@ -54,7 +60,7 @@ function run (verb, cb)
             }
         });
     } else {
-        return new Promise(function (resolve, reject) {
+        const p: Promise<string> = new Promise( (resolve: (str: string)=>void, reject: (str: string)=>void) => {
             spite.db[verb](self.query.string, self.query.inputs, function (err, data) {
                 if (err) {
                     return reject(err);
@@ -67,5 +73,6 @@ function run (verb, cb)
                 }
             });
         });
+        return p;
     }
 }

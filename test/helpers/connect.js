@@ -1,5 +1,5 @@
 
-var spite = require("../../sql-spite");
+var spite = require("../sql-spite");
 var fs = require("fs");
 
 module.exports = function (done) {

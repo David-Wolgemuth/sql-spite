@@ -1,6 +1,7 @@
-module.exports = Model;
 
-var spite = require("./sql-spite");
+export { Model };
+
+import spite from "./sql-spite";
 
 function Model (schema, data)
 {

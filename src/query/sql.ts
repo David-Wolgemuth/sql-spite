@@ -1,10 +1,7 @@
 
-module.exports = function (Query)
-{
-    Query.prototype._sql = SQL;    
-};
+export { sql }
 
-function SQL ()
+function sql ()
 {
     var q = this.raw[1];
     if (typeof q[0] !== "string") {

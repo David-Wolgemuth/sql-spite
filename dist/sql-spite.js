@@ -1,4 +1,8 @@
-
+"use strict";
+const class_model_generator_1 = require("./class-model-generator");
+const sqlite3 = require("sqlite3");
+const schema_1 = require("./schema");
+const make_promise_or_call_1 = require("./util/make-promise-or-call");
 var spite = {
     model: model,
     register: register,
@@ -7,60 +11,42 @@ var spite = {
     disconnect: disconnect,
     db: null
 };
-
-module.exports = spite;
-
-var ClassModelGenerator = require("./class-model-generator.js");
-var sqlite3 = require("sqlite3").verbose();
-var Schema = require("./schema");
-var makePromiseOrCall = require("./util/make-promise-or-call");
-
+exports.spite = spite;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = spite;
 var registered = {};
-
-function connect (name, cb)
-{
-    return makePromiseOrCall(_connect, { name: name }, cb);
+function connect(name, cb) {
+    return make_promise_or_call_1.makePromiseOrCall(_connect, { name: name }, cb);
 }
-function _connect (args, cb)
-{
+function _connect(args, cb) {
     spite.db = new sqlite3.Database(args.name + ".sqlite3", function (err) {
         cb(err);
     });
 }
-
-function disconnect ()
-{
+function disconnect() {
     registered = {};
     spite.db = null;
 }
-
-function schemas ()
-{
+function schemas() {
     var schemas_ = [];
     for (var key in registered) {
         schemas_.push(registered[key].schema);
     }
     return schemas_;
 }
-
-function model (name)
-{
+function model(name) {
     if (registered[name]) {
         return registered[name];
     }
     throw ReferenceError("Model \"" + name + "\" does not exist");
 }
-
-function register (options, schema, cb)
-{
-    return makePromiseOrCall(_register, { options: options, schema: schema }, cb);
+function register(options, schema, cb) {
+    return make_promise_or_call_1.makePromiseOrCall(_register, { options: options, schema: schema }, cb);
 }
-
-function _register (args, cb)
-{
+function _register(args, cb) {
     var options = args.options;
     var schema = args.schema;
-    if (!options || ! schema) {
+    if (!options || !schema) {
         throw Error("Schema Required to Register Model");
     }
     if (typeof options.model !== "string" || typeof options.table !== "string") {
@@ -69,8 +55,7 @@ function _register (args, cb)
     if (registered[options.model]) {
         throw ReferenceError("Model \"" + options + "\" already exists");
     }
-
-    schema = new Schema(options, schema);
+    schema = new schema_1.Schema(options, schema);
     var str = "CREATE TABLE IF NOT EXISTS " + schema.table + " ( ";
     var first = true;
     for (var i = 0; i < schema.columns.length; i++) {
@@ -82,8 +67,7 @@ function _register (args, cb)
         str += col.name + " " + col.type;
     }
     str += ")";
-    var model = new ClassModelGenerator(schema).model;
-
+    var model = new class_model_generator_1.ClassModelGenerator(schema).model;
     spite.db.run(str, function (err) {
         if (!err) {
             registered[options.model] = model;

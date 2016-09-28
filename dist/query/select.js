@@ -1,11 +1,6 @@
-
-module.exports = function (Query)
-{
-    Query.prototype._select = SELECT;    
-};
-function SELECT ()
-{
-    var query = { 
+"use strict";
+function select() {
+    var query = {
         select: "*",
         where: null,
         limit: null,
@@ -30,20 +25,20 @@ function SELECT ()
         var obj;
         switch (this.raw[i]) {
             case "by":
-                query.where = parseWhere(this.raw, i)
+                query.where = parseWhere(this.raw, i);
                 query.limit = 1;
                 break;
             case "where":
-                query.where = parseWhere(this.raw, i)
+                query.where = parseWhere(this.raw, i);
                 break;
             case "limit":
-                query.limit = this.raw[i+1];
+                query.limit = this.raw[i + 1];
                 break;
             case "select":
-                query.select = this.raw[i+1];
+                query.select = this.raw[i + 1];
                 break;
             case "order":
-                query.order = { by: this.raw[i+1] };
+                query.order = { by: this.raw[i + 1] };
                 break;
             case "asc":
                 break;
@@ -53,12 +48,11 @@ function SELECT ()
                 break;
         }
     }
-    var str = "SELECT " + query.select + " FROM " + this.model.schema.table ;
+    var str = "SELECT " + query.select + " FROM " + this.model.schema.table;
     var inputs = [];
     if (query.where) {
         // { where: { firstName: "David" } }
         if (typeof query.where === "object") {
-            
             str += " WHERE ";
             var first = true;
             for (var key in query.where) {
@@ -70,7 +64,6 @@ function SELECT ()
                 str += key + "=?";
                 inputs.push(val);
             }
-
         }
     }
     if (query.order) {
@@ -84,16 +77,15 @@ function SELECT ()
     }
     this.query = { string: str + ";", inputs: inputs };
 }
-
-function parseWhere(raw, i)
-{
-    if (typeof raw[i+1] === "string") {
+exports.select = select;
+function parseWhere(raw, i) {
+    if (typeof raw[i + 1] === "string") {
         var obj = {};
-        obj[raw[i+1]] = raw[i+2];
+        obj[raw[i + 1]] = raw[i + 2];
         return obj;
     }
-    if (typeof raw[i+1] === "object") {
-        return raw[i+1];
-    } 
+    if (typeof raw[i + 1] === "object") {
+        return raw[i + 1];
+    }
     return null;
 }
