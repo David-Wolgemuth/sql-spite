@@ -1,11 +1,11 @@
 
+import { makePromiseOrCall } from "../util/make-promise-or-call";
 import { Query } from "./query";
-import { spite } from "../sql-spite";
-// import {Promise} from 'es6-promise';
+import spite from "../sql-spite";
 
-export { addExecProtos, methods };
+export { execProtos, methods };
 
-var proto = {
+var execProtos = {
     row: function (cb)
     {
         return run.call(this, "get", cb);
@@ -26,21 +26,12 @@ var proto = {
 
 var methods = function ()
 {
-    var methods = [];
-    for (var key in proto) {
-        methods.push(key);
+    var out = [];
+    for (var key in execProtos) {
+        out.push(key);
     }
-    return methods;
+    return out;
 };
-
-function addExecProtos (Query)
-{
-    for (var key in proto) {
-        var method = proto[key];
-        console.log("The Query?", Query.prototype);
-        Query.prototype[key] = method;    
-    }
-}
 
 function run (verb, cb)
 {
@@ -49,8 +40,7 @@ function run (verb, cb)
 
     // Reset
     self.model.query = new Query(self.model);
-
-    if (typeof cb === "function") {
+    return makePromiseOrCall(verb, function () {
         spite.db[verb](self.query.string, self.query.inputs, function (err, data) {
             if (verb === "run") {
                 // These values are hidden in the `this` context, I don't like that, I might want to try to get the actual object?
@@ -59,20 +49,5 @@ function run (verb, cb)
                 cb(err, data);
             }
         });
-    } else {
-        const p: Promise<string> = new Promise( (resolve: (str: string)=>void, reject: (str: string)=>void) => {
-            spite.db[verb](self.query.string, self.query.inputs, function (err, data) {
-                if (err) {
-                    return reject(err);
-                }
-                if (verb === "run") {
-                    // These values are hidden in the `this` context, I don't like that, I might want to try to get the actual object?
-                    resolve(this.lastID, this.changes);
-                } else {
-                    resolve(data);
-                }
-            });
-        });
-        return p;
-    }
+    }, cb);
 }

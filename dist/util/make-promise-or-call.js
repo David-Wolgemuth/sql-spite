@@ -1,4 +1,5 @@
 "use strict";
+const Promise = require("bluebird");
 function makePromiseOrCall(func, args, cb) {
     if (typeof cb === "function") {
         return func(args, cb);

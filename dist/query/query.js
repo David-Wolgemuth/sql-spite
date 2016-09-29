@@ -10,7 +10,10 @@ function Query(model) {
     this.query = null;
 }
 exports.Query = Query;
-exec_1.addExecProtos(Query);
+for (var key in exec_1.execProtos) {
+    var method = exec_1.execProtos[key];
+    Query.prototype[key] = method;
+}
 Query.prototype.create = create_1.create;
 Query.prototype.select = select_1.select;
 Query.prototype.sql = sql_1.sql;

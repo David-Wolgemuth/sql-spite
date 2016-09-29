@@ -2,9 +2,9 @@
 export { Query };
 
 import { filter } from "../util/filter";
-import { spite } from "../sql-spite";
+import spite from "../sql-spite";
 
-import { addExecProtos } from "./exec";
+import { execProtos } from "./exec";
 import { create } from "./create";
 import { select } from "./select";
 import { sql } from "./sql";
@@ -17,7 +17,10 @@ function Query (model)
     this.query = null;
 }
 
-addExecProtos(Query);
+for (var key in execProtos) {
+    var method = execProtos[key];
+    Query.prototype[key] = method;    
+}
 Query.prototype.create = create;
 Query.prototype.select = select;
 Query.prototype.sql = sql;
